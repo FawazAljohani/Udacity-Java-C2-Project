@@ -9,12 +9,13 @@
     <description>A Maps mock</description>
 
     <properties>
-        <java.version>11</java.version>
+        <java.version>15</java.version>
     </properties>
 
     <modules>
         <module>boogle-maps</module>
         <module>pricing-service</module>
+        <module>vehicles-api</module>
     </modules>
 
 </project>
