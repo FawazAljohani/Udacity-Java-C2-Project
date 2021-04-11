@@ -16,6 +16,7 @@
         <module>boogle-maps</module>
         <module>pricing-service</module>
         <module>vehicles-api</module>
+        <module>Eureka</module>
     </modules>
 
 </project>
