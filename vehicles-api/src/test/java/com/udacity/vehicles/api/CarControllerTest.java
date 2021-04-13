@@ -97,6 +97,16 @@ public class CarControllerTest {
          *   below (the vehicle will be the first in the list).
          */
 
+        Car car1 = getCar();
+        Car car2 = getCar();
+
+        mvc.perform(
+                get(new URI("/cars"))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+                //.andExpect(jsonPath("$.[0].details.body").value("sedan"));
+
     }
 
     /**
