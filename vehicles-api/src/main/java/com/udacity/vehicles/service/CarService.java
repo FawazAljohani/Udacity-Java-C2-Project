@@ -1,9 +1,19 @@
 package com.udacity.vehicles.service;
 
+import com.udacity.vehicles.client.maps.Address;
+import com.udacity.vehicles.client.maps.MapsClient;
+import com.udacity.vehicles.client.prices.Price;
+import com.udacity.vehicles.client.prices.PriceClient;
+import com.udacity.vehicles.domain.Location;
 import com.udacity.vehicles.domain.car.Car;
 import com.udacity.vehicles.domain.car.CarRepository;
+
+import java.beans.beancontext.BeanContext;
 import java.util.List;
+
+import org.apache.juli.logging.Log;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * Implements the car service create, read, update or delete
@@ -14,13 +24,17 @@ import org.springframework.stereotype.Service;
 public class CarService {
 
     private final CarRepository repository;
+    private final MapsClient mapsClient;
+    private final PriceClient priceClient;
 
-    public CarService(CarRepository repository) {
+    public CarService(CarRepository repository, MapsClient mapsClient, PriceClient priceClient) {
         /**
          * TODO: Add the Maps and Pricing Web Clients you create
          *   in `VehiclesApiApplication` as arguments and set them here.
          */
+        this.mapsClient = mapsClient;
         this.repository = repository;
+        this.priceClient = priceClient;
     }
 
     /**
@@ -42,7 +56,10 @@ public class CarService {
          *   If it does not exist, throw a CarNotFoundException
          *   Remove the below code as part of your implementation.
          */
-        Car car = new Car();
+        Car car = repository.findById(id).get();
+        if(car == null){
+            throw new CarNotFoundException();
+        }
 
         /**
          * TODO: Use the Pricing Web client you create in `VehiclesApiApplication`
@@ -52,6 +69,10 @@ public class CarService {
          *   the pricing service each time to get the price.
          */
 
+        String price = priceClient.getPrice(id);
+        if(price != null){
+            car.setPrice(price);
+        }
 
         /**
          * TODO: Use the Maps Web client you create in `VehiclesApiApplication`
@@ -62,6 +83,10 @@ public class CarService {
          * meaning the Maps service needs to be called each time for the address.
          */
 
+        Location location = mapsClient.getAddress(car.getLocation());
+        if(location != null){
+            car.setLocation(location);
+        }
 
         return car;
     }
@@ -77,10 +102,10 @@ public class CarService {
                     .map(carToBeUpdated -> {
                         carToBeUpdated.setDetails(car.getDetails());
                         carToBeUpdated.setLocation(car.getLocation());
+                        carToBeUpdated.setCondition(car.getCondition());
                         return repository.save(carToBeUpdated);
                     }).orElseThrow(CarNotFoundException::new);
         }
-
         return repository.save(car);
     }
 
@@ -88,17 +113,29 @@ public class CarService {
      * Deletes a given car by ID
      * @param id the ID number of the car to delete
      */
-    public void delete(Long id) {
+    public int delete(Long id) {
         /**
          * TODO: Find the car by ID from the `repository` if it exists.
          *   If it does not exist, throw a CarNotFoundException
          */
 
+        Car car = repository.findById(id).get();
+
+        if(car == null){
+            throw new CarNotFoundException();
+        }
 
         /**
          * TODO: Delete the car from the repository.
          */
+        try {
 
+            repository.delete(car);
+            return 1;
+        } catch (Exception e){
+            System.out.println("did't deleted");
+            return 0;
+        }
 
     }
 }

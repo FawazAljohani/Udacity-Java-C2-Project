@@ -104,8 +104,8 @@ public class CarControllerTest {
                 get(new URI("/cars"))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
-                //.andExpect(jsonPath("$.[0].details.body").value("sedan"));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$._embedded.carList.[0].condition").value("USED"));
 
     }
 
