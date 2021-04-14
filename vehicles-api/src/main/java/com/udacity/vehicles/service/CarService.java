@@ -42,6 +42,13 @@ public class CarService {
      * @return a list of all vehicles in the CarRepository
      */
     public List<Car> list() {
+
+        List<Car> list = repository.findAll();
+        for (Car car : list)
+              {
+                car.setPrice(priceClient.getPrice(car.getId()));
+                car.setLocation(mapsClient.getAddress(car.getLocation()));
+        }
         return repository.findAll();
     }
 
@@ -133,7 +140,6 @@ public class CarService {
             repository.delete(car);
             return 1;
         } catch (Exception e){
-            System.out.println("did't deleted");
             return 0;
         }
 
